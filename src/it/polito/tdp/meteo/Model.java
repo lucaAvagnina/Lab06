@@ -8,6 +8,7 @@ import it.polito.tdp.meteo.bean.Rilevamento;
 import it.polito.tdp.meteo.bean.SimpleCity;
 import it.polito.tdp.meteo.db.MeteoDAO;
 
+
 public class Model {
 
 	private final static int COST = 100;
@@ -15,8 +16,8 @@ public class Model {
 	private final static int NUMERO_GIORNI_CITTA_MAX = 6;
 	private final static int NUMERO_GIORNI_TOTALI = 15;
 
-	private static double costo_best; 
-	private static List<Citta> best;
+	private double costo_best; 
+	private List<Citta> best;
 	
 	private MeteoDAO meteoDAO;
 	private List<Citta> cittaList;
@@ -41,8 +42,8 @@ public class Model {
 
 	public String trovaSequenza(int mese) {
 		
-		String lista ="";
-		best = new ArrayList<Citta>();
+		String lista ="La sequenza corretta è:\n";
+		best = null;
 		costo_best = 0.0;
 		
 		cittaList = meteoDAO.getCitta();
@@ -55,38 +56,39 @@ public class Model {
 		
 		this.cercaSequenza(parziale, 0);
 		
+		int i = 0;
 		for(Citta c : best) {
-			lista += ((Citta) best).getNome(); 
+			lista += "-"+ (i+1) +"\t" +c.toString() + "\t\t"+ best.get(i).getRilevamenti().get(i).getData().toString().substring(5)+ "\n"; 
+			i++;
 		}
 		
-		return lista;
+		return lista.trim();
 	}
 	
 	private void cercaSequenza(List<Citta> parziale, int livello) {
 		
 		if(livello == NUMERO_GIORNI_TOTALI) {
 			double costo = calcoloCosto(parziale);
-			if(costo < costo_best) {
+			if(costo < costo_best || costo_best == 0.0) {
 				costo_best = costo;
-				best = parziale;
+				best = new ArrayList<Citta>(parziale);
 				return;
 			}else {
 				return;
 			}
 			
 		}else {
-			int count = 0;
 			for(Citta c : cittaList) {
-				count++;
-				if(count>1) {
+				
+				if(livello>0) {
 					if(verificaCondizioni(c, parziale) == true) {
-							parziale.add(c);
+							parziale.add(c.clone());
 							cercaSequenza(parziale, livello+1);
 							parziale.remove(c);
 						}
 					}
 				else {
-					parziale.add(c);
+					parziale.add(c.clone());
 					cercaSequenza(parziale, livello+1);
 					parziale.remove(c);
 				}
@@ -104,7 +106,7 @@ public class Model {
 		for(Citta c : parziale) {
 			if(c.equals(citta)) {
 				conta++;
-				if(conta > NUMERO_GIORNI_CITTA_MAX)
+				if(conta == NUMERO_GIORNI_CITTA_MAX)
 					validoMax = false;
 			}
 		}

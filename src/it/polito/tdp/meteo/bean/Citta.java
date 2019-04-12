@@ -1,11 +1,12 @@
 package it.polito.tdp.meteo.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Citta {
 
 	private String nome;
-	private List<Rilevamento> rilevamenti;
+	private List<Rilevamento> rilevamenti = new ArrayList<Rilevamento>();
 	private int counter = 0;
 	
 	public Citta(String nome) {
@@ -75,4 +76,9 @@ public class Citta {
 		return nome;
 	}
 	
+	public Citta clone() {
+		Citta c = new Citta(this.nome);
+		c.rilevamenti = new ArrayList<>(this.rilevamenti);
+		return c;
+	}
 }
