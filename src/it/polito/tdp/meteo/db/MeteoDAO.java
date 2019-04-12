@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.polito.tdp.meteo.bean.Citta;
 import it.polito.tdp.meteo.bean.Rilevamento;
 
 public class MeteoDAO {
@@ -40,13 +41,95 @@ public class MeteoDAO {
 	}
 
 	public List<Rilevamento> getAllRilevamentiLocalitaMese(int mese, String localita) {
+		final String sql = "SELECT localita, DATA, Umidita FROM situazione WHERE MONTH(DATA) = ? && DAY(DATA) <=15 && localita = ? ORDER BY data ASC";
 
-		return null;
+		List<Rilevamento> rilevamenti = new ArrayList<Rilevamento>();
+
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+
+			st.setInt(1, mese);
+			st.setString(2, localita);
+			
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
+				rilevamenti.add(r);
+			}
+
+			conn.close();
+			return rilevamenti;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Double getAvgRilevamentiLocalitaMese(int mese, String localita) {
+		
+		final String sql = "SELECT AVG(Umidita) aVG FROM situazione WHERE MONTH(DATA) = ? AND localita = ? ";
+		
+		Double media = 0.0;
+		
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1, mese);
+			st.setString(2, localita);
 
-		return 0.0;
+			ResultSet rs = st.executeQuery();
+
+			if(rs.next()) {
+
+				media = rs.getDouble("aVG");
+			
+			}
+
+			conn.close();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+
+		return media;
+	}
+	
+	public List<Citta> getCitta() {
+		
+		List<Citta> cittaList = new ArrayList<Citta>();
+		
+		final String sql = "SELECT distinct localita FROM situazione";
+
+		try {
+			Connection conn = DBConnect.getInstance().getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+					
+				Citta c = new Citta(rs.getString("localita"));
+				cittaList.add(c);
+		
+			}
+
+			conn.close();
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		return cittaList;
 	}
 
 }
