@@ -106,7 +106,7 @@ public class MeteoDAO {
 		
 		List<Citta> cittaList = new ArrayList<Citta>();
 		
-		final String sql = "SELECT distinct localita FROM situazione";
+		final String sql = "SELECT distinct localita FROM situazione ORDER BY Localita ASC";
 
 		try {
 			Connection conn = DBConnect.getInstance().getConnection();

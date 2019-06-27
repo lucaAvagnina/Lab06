@@ -23,6 +23,8 @@ public class Model {
 	private List<Citta> cittaList;
 	
 	public Model() {
+		//Potrei anche inizializzare direttamente qui 
+		//MeteoDAO meteoDAO = new MeteoDAO();
 		meteoDAO = new MeteoDAO();
 		cittaList = new ArrayList<Citta>();
 	}
@@ -62,14 +64,17 @@ public class Model {
 			i++;
 		}
 		
+		lista += "Il costo totale è di: " + costo_best;
+		
 		return lista.trim();
 	}
 	
 	private void cercaSequenza(List<Citta> parziale, int livello) {
-		
+	
+		//CASO TERMINALE
 		if(livello == NUMERO_GIORNI_TOTALI) {
 			double costo = calcoloCosto(parziale);
-			if(costo < costo_best || costo_best == 0.0) {
+			if(costo < costo_best || best == null) {
 				costo_best = costo;
 				best = new ArrayList<Citta>(parziale);
 				return;
@@ -80,6 +85,7 @@ public class Model {
 		}else {
 			for(Citta c : cittaList) {
 				
+				//VINCOLO
 				if(livello>0) {
 					if(verificaCondizioni(c, parziale) == true) {
 							parziale.add(c.clone());
@@ -97,12 +103,18 @@ public class Model {
 		
 	}
 
-
+	/**
+	 * Dati i valori
+	 * @param citta
+	 * @param parziale
+	 * @return {@code true} se posso ancora aggiungere la citta, {@code false} se non posso
+	 */
 	private boolean verificaCondizioni(Citta citta, List<Citta> parziale) {
 		int conta = 0;
 		boolean validoMax = true;
 		boolean validoMin = false;
 		
+		//Controlla numero giorni massimi
 		for(Citta c : parziale) {
 			if(c.equals(citta)) {
 				conta++;
@@ -111,11 +123,25 @@ public class Model {
 			}
 		}
 		
+		//Controlla numergo giorni minimi
 		for(int i=2; i < parziale.size()-1; i++) {
 			if(parziale.get(i).equals(citta) && parziale.get(i-1).equals(citta) && parziale.get(i-2).equals(citta)) {
 				validoMin = true;
 			}
 		}
+		
+		/*
+		 * Potrei anche fare 
+		 * 
+		 * if(paziale.size() == 1 || parziale.size() == 2) //Allora non posso cambiare
+		 * 	return (parziale.get(parziale.size()-1).equals(prova));
+		 * if(parziale.get(parziale.size()-1).equals(prova)) //giorni successivi e posso rimanere
+		 * 	return true;
+		 * if(parziale.get(parziale.get(parziale.size()-1)).equals(parziale.get(parziale.size()-2)) && parzaiel.get(parziale.get(parziale.size()-2)).equals(parziale.get(parziale.size()-3)))
+		 * 	return true;
+		 * 
+		 * return false;
+		 */
 		
 		if((validoMin == true && validoMax == true) || (validoMin == false && validoMax == true)) {
 			return true;
@@ -126,7 +152,12 @@ public class Model {
 		
 	}
 
-	private double calcoloCosto(List<Citta> parziale) {
+	/**
+	 * Data la lista parziale
+	 * @param parziale
+	 * @return {@code Double} costo che equivale al costo relativo alla sequenza presente nella lista parziale
+	 */
+	private Double calcoloCosto(List<Citta> parziale) {
 		
 		double costo = 0.0;
 		

@@ -38,6 +38,8 @@ public class MeteoController {
 		
 		txtResult.clear();
 		
+		//Si poteva anche mettere Month mese
+		//Month mese = boxMese.getValue();
 		int mese = boxMese.getValue().getValue();
 		
 		String percorsoOttimo = model.trovaSequenza(mese);
@@ -64,6 +66,7 @@ public class MeteoController {
 		assert btnUmidita != null : "fx:id=\"btnUmidita\" was not injected: check your FXML file 'Meteo.fxml'.";
 		assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Meteo.fxml'.";
 		
+		//Inserisco nella choiceBox le opzioni di scelta, in questo caso sono i mesi
 		for(int i=1; i<13; i++)
 			boxMese.getItems().add(Month.of(i));
 	}
